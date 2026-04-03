@@ -1,26 +1,28 @@
 import { ChatClient } from "@twurple/chat";
 import { loadConfiguration } from "./config";
+import { logger as baseLogger } from "./logger";
 import { createAndStartPipeServer, namesQueue } from "./queue";
 
-const { joinCommand, twitchChannel } = await loadConfiguration();
+const { joinCommand, popQueueRandomly: shouldPopQueueRandomly, twitchChannel } = await loadConfiguration();
 const chatClient = new ChatClient({ channels: [twitchChannel] });
+const logger = baseLogger.getSubLogger({ name: "Main" });
 
 chatClient.connect();
-createAndStartPipeServer();
+createAndStartPipeServer({ shouldPopQueueRandomly });
 
 if (joinCommand) {
-  console.log(`Listening on #${twitchChannel} for "${joinCommand}" command`);
+  logger.info(`Listening on #${twitchChannel} for "${joinCommand}" command.`);
 } else {
-  console.log(`Listening on #${twitchChannel}, all chatters will be queued.`);
+  logger.info(`Listening on #${twitchChannel}, all chatters will be queued.`);
 }
 
 chatClient.onConnect(() => {
-  console.log("Connected to Twitch IRC");
+  logger.info("Connected to Twitch IRC");
 });
 
 chatClient.onDisconnect((manually) => {
   if (!manually) {
-    console.warn("Disconnected from Twitch IRC, attempting to reconnect...");
+    logger.warn("Disconnected from Twitch IRC, attempting to reconnect...");
   }
 });
 
@@ -36,5 +38,5 @@ chatClient.onMessage(async (_channel, _user, messageText, chatMessage) => {
   }
 
   namesQueue.push(chatterName);
-  console.log(`${chatterName} joined queue (${namesQueue.length} waiting)`);
+  logger.info(`${chatterName} joined queue (${namesQueue.length} waiting)`);
 });

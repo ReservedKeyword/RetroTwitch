@@ -1,7 +1,10 @@
 import { EOL } from "node:os";
+import { logger as baseLogger } from "./logger";
+
+const logger = baseLogger.getSubLogger({ name: "Utility" });
 
 export async function exitWithPause(exitCode: number): Promise<never> {
-  console.log(`${EOL}Press Enter to exit...`);
+  logger.info(`${EOL}Press Enter to exit...`);
 
   for await (const _ of console) {
     break;
