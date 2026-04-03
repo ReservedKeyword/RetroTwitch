@@ -5,7 +5,8 @@
   "private": true,
   "module": "index.ts",
   "scripts": {
-    "compile": "bun build --compile --minify --outfile retro-rewind-companion ./src/index.ts"
+    "compile": "bun build --compile --minify --outfile retro-rewind-companion ./src/index.ts",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@twurple/chat": "^8.1.2",

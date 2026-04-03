@@ -1,11 +1,12 @@
 import { ChatClient } from "@twurple/chat";
 import { loadConfiguration } from "./config";
-import { namesQueue } from "./queue";
+import { createAndStartPipeServer, namesQueue } from "./queue";
 
 const { joinCommand, twitchChannel } = await loadConfiguration();
 const chatClient = new ChatClient({ channels: [twitchChannel] });
 
 chatClient.connect();
+createAndStartPipeServer();
 
 if (joinCommand) {
   console.log(`Listening on #${twitchChannel} for "${joinCommand}" command`);

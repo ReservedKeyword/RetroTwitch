@@ -1,5 +1,6 @@
 import Ajv2020, { type JSONSchemaType } from "ajv/dist/2020";
 import { EOL } from "node:os";
+import { exitWithPause } from "./utils";
 
 export interface Configuration {
   twitchChannel: string;
@@ -39,7 +40,7 @@ export async function loadConfiguration(): Promise<Configuration> {
   if (!(await configFile.exists())) {
     await Bun.write(CONFIG_PATH, JSON.stringify(DEFAULT_CONFIGURATION, null, 2) + EOL);
     console.log(`Created ${CONFIG_PATH}. Fill in your settings and run again.`);
-    process.exit(0);
+    return await exitWithPause(0);
   }
 
   const rawContents = await configFile.json();
@@ -51,7 +52,7 @@ export async function loadConfiguration(): Promise<Configuration> {
       console.error(`  ${validationError.instancePath ?? "/"}: ${validationError.message}`);
     }
 
-    process.exit(1);
+    return await exitWithPause(1);
   }
 
   return rawContents;
