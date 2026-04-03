@@ -4,9 +4,10 @@ import { logger as baseLogger } from "./logger";
 import { exitWithPause } from "./utils";
 
 export interface Configuration {
-  twitchChannel: string;
-  popQueueRandomly: boolean;
   joinCommand?: string | undefined;
+  maxQueueSize: number;
+  popQueueRandomly: boolean;
+  twitchChannel: string;
 }
 
 const CONFIG_PATH = "companion.config.json";
@@ -17,8 +18,12 @@ const configSchema: JSONSchemaType<Configuration> = {
   properties: {
     joinCommand: {
       type: "string",
-      nullable: true,
-      minLength: 1
+      minLength: 1,
+      nullable: true
+    },
+    maxQueueSize: {
+      type: "integer",
+      minimum: 1
     },
     popQueueRandomly: {
       type: "boolean"
@@ -28,7 +33,7 @@ const configSchema: JSONSchemaType<Configuration> = {
       minLength: 1
     }
   },
-  required: ["popQueueRandomly", "twitchChannel"],
+  required: ["maxQueueSize", "popQueueRandomly", "twitchChannel"],
   additionalProperties: false
 };
 
@@ -37,6 +42,7 @@ const validateFn = ajv.compile(configSchema);
 
 const DEFAULT_CONFIGURATION: Configuration = {
   joinCommand: "!join",
+  maxQueueSize: 250,
   popQueueRandomly: false,
   twitchChannel: "ReservedKeyword"
 };

@@ -54,19 +54,21 @@ ue4ss/
 
 ### Start the Companion App
 
-Double-click on the `retro-rewind-companion.exe` application. If thi is your first time running this app, you may be prompted to exit and edit the configuration file.
+Double-click on the `retro-rewind-companion.exe` application. If this is your first time running this app, you may be prompted to exit and edit the configuration file.
 
-If this occurs, the configuration file is located within the same directory, as `companion.config.json`, and will look similar to the following:
+If this occurs, the configuration file is located within the same directory as `companion.config.json`, and will look similar to the following:
 
 ```json
 {
   "joinCommand": "!join",
+  "maxQueueSize": 250,
   "popQueueRandomly": false,
   "twitchChannel": "ReservedKeyword"
 }
 ```
 
 * `joinCommand`: The command (e.g., "!join") that someone in chat must type to get entered into the queue.
+* `maxQueueSize`: The upper limit of in-memory chatter names to keep in the queue. Any chatter that expresses intent to be an in-game character above this limit will be denied until the queue pops.
 * `popQueueRandomly`: If true, a queue pop command will randomly select a chatter; otherwise, it will follow FIFO.
 * `twitchChannel`: Your Twitch channel username (e.g., "ReservedKeyword").
 

@@ -3,7 +3,13 @@ import { loadConfiguration } from "./config";
 import { logger as baseLogger } from "./logger";
 import { createAndStartPipeServer, namesQueue } from "./queue";
 
-const { joinCommand, popQueueRandomly: shouldPopQueueRandomly, twitchChannel } = await loadConfiguration();
+const {
+  joinCommand,
+  maxQueueSize,
+  popQueueRandomly: shouldPopQueueRandomly,
+  twitchChannel
+} = await loadConfiguration();
+
 const chatClient = new ChatClient({ channels: [twitchChannel] });
 const logger = baseLogger.getSubLogger({ name: "Main" });
 
@@ -32,6 +38,10 @@ chatClient.onMessage(async (_channel, _user, messageText, chatMessage) => {
   }
 
   const chatterName = chatMessage.userInfo.displayName;
+
+  if (namesQueue.length >= maxQueueSize) {
+    return;
+  }
 
   if (namesQueue.includes(chatterName)) {
     return;
