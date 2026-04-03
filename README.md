@@ -31,6 +31,8 @@ This project has two (2) parts:
 
 3. Extract the UE4SS zip archive into this directory — the `ue4ss` directory and the `dwmapi.dll` file.
 
+4. In `ue4ss/UE4SS-settings.ini`, update `ConsoleEnabled = 0` to `ConsoleEnabled = 1` to see the UE4SS console, ensuring that the mod is loading and chatters are added to the game.
+
 ### Twitch Integration Mod
 
 1. Copy the `TwitchIntegrationMod` directory, located inside the release zip archive, into the `ue4ss/Mods` directory.
