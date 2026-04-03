@@ -8,7 +8,8 @@
     "compile": "bun build --compile --minify --outfile retro-rewind-companion ./src/index.ts"
   },
   "dependencies": {
-    "@twurple/chat": "^8.1.2"
+    "@twurple/chat": "^8.1.2",
+    "ajv": "^8.18.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
