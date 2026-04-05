@@ -4,15 +4,19 @@ import { logger as baseLogger } from "./logger";
 import { chattersQueue, type ChatterQueueEntry } from "./queue";
 import { exitWithPause } from "./utils";
 
-type CreateAndStartPipeServerOptions = Pick<Configuration, "popQueueRandomly">;
+type CreateAndStartPipeServerOptions = Pick<Configuration, "keepChattersInQueue" | "popQueueRandomly">;
 
 const COMMAND_POP = "POP";
 const PIPE_PATH = "\\\\.\\pipe\\RetroRewindCompanion";
 
 const logger = baseLogger.getSubLogger({ name: "Named Pipe" });
 
-export function createAndStartPipeServer({ popQueueRandomly }: CreateAndStartPipeServerOptions): void {
-  logger.info("Is the queue popped randomly? ", popQueueRandomly);
+export function createAndStartPipeServer({
+  keepChattersInQueue,
+  popQueueRandomly
+}: CreateAndStartPipeServerOptions): void {
+  logger.info("Are chatters re-added to queue after pop? ", keepChattersInQueue);
+  logger.info("Is the queue popped at a random index? ", popQueueRandomly);
 
   const pipeServer = createServer((connection) => {
     connection.on("data", (data) => {
@@ -22,7 +26,15 @@ export function createAndStartPipeServer({ popQueueRandomly }: CreateAndStartPip
         const chatterQueueEntry = fetchChatterQueueEntry({ popQueueRandomly });
 
         if (chatterQueueEntry) {
-          logger.info(`Sent "${chatterQueueEntry.displayName}" to game (${chattersQueue.length} remaining)`);
+          if (keepChattersInQueue) {
+            chattersQueue.push(chatterQueueEntry);
+            logger.info(`Chatter "${chatterQueueEntry.displayName}" has been re-added to the queue`);
+          }
+
+          logger.info(
+            `Chatter "${chatterQueueEntry.displayName}" has been sent to the UE4SS Lua script (${chattersQueue.length} remaining)`
+          );
+
           connection.write(JSON.stringify(chatterQueueEntry) + "\n");
         } else {
           connection.write("\n");

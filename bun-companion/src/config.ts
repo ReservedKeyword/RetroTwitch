@@ -5,6 +5,7 @@ import { exitWithPause } from "./utils";
 
 export interface Configuration {
   joinCommand?: string | undefined;
+  keepChattersInQueue: boolean;
   maxQueueSize: number;
   popQueueRandomly: boolean;
   showDisplayNameAboveHead: boolean;
@@ -21,6 +22,9 @@ const configSchema: JSONSchemaType<Configuration> = {
       type: "string",
       minLength: 1,
       nullable: true
+    },
+    keepChattersInQueue: {
+      type: "boolean"
     },
     maxQueueSize: {
       type: "integer",
@@ -46,6 +50,7 @@ const validateFn = ajv.compile(configSchema);
 
 const DEFAULT_CONFIGURATION: Configuration = {
   joinCommand: "!join",
+  keepChattersInQueue: true,
   maxQueueSize: 250,
   popQueueRandomly: false,
   showDisplayNameAboveHead: true,

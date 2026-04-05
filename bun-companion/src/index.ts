@@ -4,19 +4,26 @@ import { logger as baseLogger } from "./logger";
 import { createAndStartPipeServer } from "./named-pipe";
 import { chattersQueue } from "./queue";
 
-const { joinCommand, maxQueueSize, popQueueRandomly, showDisplayNameAboveHead, twitchChannel } =
+const { joinCommand, keepChattersInQueue, maxQueueSize, popQueueRandomly, showDisplayNameAboveHead, twitchChannel } =
   await loadConfiguration();
 
 const chatClient = new ChatClient({ channels: [twitchChannel] });
 const logger = baseLogger.getSubLogger({ name: "Main" });
 
 chatClient.connect();
-createAndStartPipeServer({ popQueueRandomly });
+createAndStartPipeServer({ keepChattersInQueue, popQueueRandomly });
 
 if (joinCommand) {
   logger.info(`Listening on #${twitchChannel} for "${joinCommand}" command.`);
 } else {
   logger.info(`Listening on #${twitchChannel}, all chatters will be queued.`);
+}
+
+if (keepChattersInQueue) {
+  logger.warn("keepChattersInQueue is currently enabled.");
+  logger.warn("This means that chatters who are removed from the queue are immediately re-added,");
+  logger.warn("potentially meaning that if you're at the maximum queue size you've defined, then");
+  logger.warn("new chatters may not get added. Please ensure this is the behavior you want.");
 }
 
 chatClient.onConnect(() => {
