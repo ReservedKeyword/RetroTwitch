@@ -1,21 +1,17 @@
 import { ChatClient } from "@twurple/chat";
 import { loadConfiguration } from "./config";
 import { logger as baseLogger } from "./logger";
-import { createAndStartPipeServer, namesQueue } from "./queue";
+import { createAndStartPipeServer } from "./named-pipe";
+import { chattersQueue } from "./queue";
 
-const {
-  joinCommand,
-  maxQueueSize,
-  popQueueRandomly: shouldPopQueueRandomly,
-  showDisplayNameAboveHead,
-  twitchChannel
-} = await loadConfiguration();
+const { joinCommand, maxQueueSize, popQueueRandomly, showDisplayNameAboveHead, twitchChannel } =
+  await loadConfiguration();
 
 const chatClient = new ChatClient({ channels: [twitchChannel] });
 const logger = baseLogger.getSubLogger({ name: "Main" });
 
 chatClient.connect();
-createAndStartPipeServer({ shouldPopQueueRandomly });
+createAndStartPipeServer({ popQueueRandomly });
 
 if (joinCommand) {
   logger.info(`Listening on #${twitchChannel} for "${joinCommand}" command.`);
@@ -40,18 +36,18 @@ chatClient.onMessage(async (_channel, _user, messageText, chatMessage) => {
 
   const chatterName = chatMessage.userInfo.displayName;
 
-  if (namesQueue.length >= maxQueueSize) {
+  if (chattersQueue.length >= maxQueueSize) {
     return;
   }
 
-  if (namesQueue.some(({ displayName }) => chatterName === displayName)) {
+  if (chattersQueue.some(({ displayName }) => chatterName === displayName)) {
     return;
   }
 
-  namesQueue.push({
+  chattersQueue.push({
     displayName: chatterName,
     showNameAboveHead: showDisplayNameAboveHead
   });
 
-  logger.info(`${chatterName} joined queue (${namesQueue.length} waiting)`);
+  logger.info(`${chatterName} joined queue (${chattersQueue.length} waiting)`);
 });
