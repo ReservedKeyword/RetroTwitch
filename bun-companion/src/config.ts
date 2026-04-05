@@ -57,6 +57,13 @@ export async function loadConfiguration(): Promise<Configuration> {
   }
 
   const rawContents = await configFile.json();
+  const mergedContents = { ...DEFAULT_CONFIGURATION, ...rawContents };
+  const newPropertyKeys = Object.keys(DEFAULT_CONFIGURATION).filter((key) => !(key in rawContents));
+
+  if (newPropertyKeys.length > 0) {
+    await Bun.write(CONFIG_PATH, JSON.stringify(mergedContents, null, 2) + EOL);
+    logger.info(`Added new config option(s) to ${CONFIG_PATH}: ${newPropertyKeys.join(", ")}`);
+  }
 
   if (!validateFn(rawContents)) {
     logger.error(`Invalid configuration in ${CONFIG_PATH}:`);
