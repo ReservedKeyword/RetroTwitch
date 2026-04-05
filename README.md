@@ -61,15 +61,24 @@ If this occurs, the configuration file is located within the same directory as `
 ```json
 {
   "joinCommand": "!join",
+  "keepChattersInQueue": true,
   "maxQueueSize": 250,
   "popQueueRandomly": false,
+  "showDisplayNameAboveHead": true,
   "twitchChannel": "ReservedKeyword"
 }
 ```
 
 * `joinCommand`: The command (e.g., "!join") that someone in chat must type to get entered into the queue.
+
+* `keepChattersInQueue`: If true, when a chatter is removed from the queue, either in FIFO or random order, they are immediately re-added back. This is useful if the queue has potential to fully exhaust; however, note that if your queue is frequently at its capacity, this option, when enabled, could prevent from new chatters from being able to join.
+
 * `maxQueueSize`: The upper limit of in-memory chatter names to keep in the queue. Any chatter that expresses intent to be an in-game character above this limit will be denied until the queue pops.
+
 * `popQueueRandomly`: If true, a queue pop command will randomly select a chatter; otherwise, it will follow FIFO.
+
+* `showDisplayNameAboveHead`: If true, the display name of the chatter is shown above the in-game character's head, otherwise the character's name is only changed, meaning that you will only know the chatter during checkout or if they have a question.
+
 * `twitchChannel`: Your Twitch channel username (e.g., "ReservedKeyword").
 
 ![Bun Companion App](./images/companion-running.png)
