@@ -4,6 +4,7 @@ import { logger as baseLogger } from "./logger";
 import { exitWithPause } from "./utils";
 
 export interface Configuration {
+  allowModeratorsToClearQueue: boolean;
   joinCommand?: string | undefined;
   keepChattersInQueue: boolean;
   maxQueueSize: number;
@@ -18,6 +19,9 @@ const logger = baseLogger.getSubLogger({ name: "Config" });
 const configSchema: JSONSchemaType<Configuration> = {
   type: "object",
   properties: {
+    allowModeratorsToClearQueue: {
+      type: "boolean"
+    },
     joinCommand: {
       type: "string",
       minLength: 1,
@@ -41,7 +45,14 @@ const configSchema: JSONSchemaType<Configuration> = {
       minLength: 1
     }
   },
-  required: ["maxQueueSize", "popQueueRandomly", "showDisplayNameAboveHead", "twitchChannel"],
+  required: [
+    "allowModeratorsToClearQueue",
+    "keepChattersInQueue",
+    "maxQueueSize",
+    "popQueueRandomly",
+    "showDisplayNameAboveHead",
+    "twitchChannel"
+  ],
   additionalProperties: false
 };
 
@@ -49,6 +60,7 @@ const ajv = new Ajv2020();
 const validateFn = ajv.compile(configSchema);
 
 const DEFAULT_CONFIGURATION: Configuration = {
+  allowModeratorsToClearQueue: true,
   joinCommand: "!join",
   keepChattersInQueue: true,
   maxQueueSize: 250,

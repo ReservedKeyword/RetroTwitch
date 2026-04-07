@@ -4,8 +4,15 @@ import { logger as baseLogger } from "./logger";
 import { createAndStartPipeServer } from "./named-pipe";
 import { chattersQueue } from "./queue";
 
-const { joinCommand, keepChattersInQueue, maxQueueSize, popQueueRandomly, showDisplayNameAboveHead, twitchChannel } =
-  await loadConfiguration();
+const {
+  allowModeratorsToClearQueue,
+  joinCommand,
+  keepChattersInQueue,
+  maxQueueSize,
+  popQueueRandomly,
+  showDisplayNameAboveHead,
+  twitchChannel
+} = await loadConfiguration();
 
 const chatClient = new ChatClient({ channels: [twitchChannel] });
 const logger = baseLogger.getSubLogger({ name: "Main" });
@@ -37,7 +44,20 @@ chatClient.onDisconnect((manually) => {
 });
 
 chatClient.onMessage(async (_channel, _user, messageText, chatMessage) => {
-  if (joinCommand && !messageText.trim().toLowerCase().includes(joinCommand)) {
+  const trimmedMessage = messageText.trim().toLowerCase();
+
+  if (
+    allowModeratorsToClearQueue &&
+    trimmedMessage === "!clearqueue" &&
+    (chatMessage.userInfo.isBroadcaster || chatMessage.userInfo.isMod)
+  ) {
+    const previousQueueSize = chattersQueue.length;
+    chattersQueue.length = 0;
+    logger.info(`Queue cleared by ${chatMessage.userInfo.displayName} (${previousQueueSize} chatter[s] removed)`);
+    return;
+  }
+
+  if (joinCommand && !trimmedMessage.includes(joinCommand)) {
     return;
   }
 
